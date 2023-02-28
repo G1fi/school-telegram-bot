@@ -16,7 +16,7 @@ weekdays = {
 
 
 def get_date_tuple(date: datetime.datetime, offset: int = 0, utc: bool = True) -> tuple:
-    date = date.astimezone(datetime.timezone(datetime.timedelta(hours=10 if utc else 0)))
+    date = date.astimezone(datetime.timezone(datetime.timedelta(hours=10))) if utc else date
     date += datetime.timedelta(hours=offset)
     return date.date(), weekdays[date.isoweekday()]
 
@@ -73,22 +73,13 @@ def parse_xlsx(file: BytesIO) -> list:
 def format_schedule(schedule: list | None) -> None | str:
     if not schedule:
         return None
-    else:
-        text = f'# |      Время      | Урок       \n{"-"*48}\n'
-        for lesson in schedule:
-            text += '{:<3}| {:<10} | {:<}, {:<}\n'.format(
-                lesson["lesson"][1],
-                f'{lesson["lesson_start"]}-{lesson["lesson_end"]}',
-                lesson["lesson_name"],
-                lesson["classroom"] if lesson["classroom"] else "-",
-            )
-        return text
 
-
-def main() -> None:
-    pass
-
-
-if __name__ == '__main__':
-    main()
-
+    text = f'# |      Время      | Урок       \n{"-"*48}\n'
+    for lesson in schedule:
+        text += '{:<3}| {:<10} | {:<}, {:<}\n'.format(
+            lesson["lesson"][1],
+            f'{lesson["lesson_start"]}-{lesson["lesson_end"]}',
+            lesson["lesson_name"],
+            lesson["classroom"] if lesson["classroom"] else "-",
+        )
+    return text
