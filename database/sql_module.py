@@ -200,11 +200,6 @@ async def get_requests_statistic(start_date: datetime.date, end_date: datetime.d
 
 async def main() -> None:
     await create_tables()
-    for i in range(8):
-        await add_request('add_schedule', f'condition_params: {5 + 5}')
-    for i in range(654):
-        await add_request('get_schedule', f'condition_params: {5+5}')
-
 
 if __name__ == '__main__':
     import asyncio
