@@ -26,7 +26,7 @@ async def create_tables() -> None:
 
             await cursor.execute('''CREATE TABLE IF NOT EXISTS requests (
                                     date DATE,
-                                    request_type CHAR(10),
+                                    request_type CHAR(20),
                                     details TEXT
                                 )''')
 
@@ -166,10 +166,10 @@ async def clear_old_schedule_entries(date: datetime.date) -> int:
     return deleted_rows.rowcount
 
 
-async def get_users_with_mailing():
+async def get_users(with_mailing: bool = False):
     async with aiosqlite.connect(config.database_path) as db:
         async with await db.cursor() as cursor:
-            await cursor.execute('SELECT user_id, class FROM users WHERE mailing=1')
+            await cursor.execute(f'SELECT * FROM users {"WHERE mailing = 1" if with_mailing else ""}')
             users = await cursor.fetchall()
 
     return users
@@ -200,6 +200,10 @@ async def get_requests_statistic(start_date: datetime.date, end_date: datetime.d
 
 async def main() -> None:
     await create_tables()
+    for i in range(8):
+        await add_request('add_schedule', f'condition_params: {5 + 5}')
+    for i in range(654):
+        await add_request('get_schedule', f'condition_params: {5+5}')
 
 
 if __name__ == '__main__':

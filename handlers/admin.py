@@ -30,14 +30,18 @@ async def command_admin_handler(message: Message) -> None:
     logging.info(f'Login to the admin panel! '
                  f'{message.from_user.full_name} ({message.from_user.id})')
 
+    users_count = len(await sql_module.get_users())
     today = datetime.datetime.today()
     old_week = get_date_tuple(today, offset=-168)[0]
     new_week = get_date_tuple(today, offset=168)[0]
+    requests_statistic = await sql_module.get_requests_statistic(old_week, new_week)
 
-    await message.answer(f'Добро пожаловать в админ-панель, '
-                         f'{message.from_user.full_name}!\n'
+    await message.answer(f'Добро пожаловать в админ-панель!\n'
+                         f'{message.from_user.full_name}\n\n'
+                         f'Пользователей в боте: {users_count}\n'
                          f'Статистика запросов за неделю:\n'
-                         f'{await sql_module.get_requests_statistic(old_week, new_week)}',
+                         f'Получить расписание - {requests_statistic["get_schedule"]} раз\n'
+                         f'Добавить расписание - {requests_statistic["add_schedule"]} раз\n',
                          reply_markup=admin_kb())
 
 
@@ -58,7 +62,7 @@ async def mailing_handler(callback: CallbackQuery, state: FSMContext) -> None:
 @router.message(States.mailing)
 async def confirm_mailing(message: Message, state: FSMContext) -> None:
     confirm_kb = make_row_keyboard([['Подтвердить', 'confirm_mailing']])
-    users = await sql_module.get_users_with_mailing()
+    users = await sql_module.get_users(with_mailing=True)
 
     await state.set_data({'message': message, 'users': users})
 
